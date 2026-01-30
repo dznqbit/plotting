@@ -37,6 +37,7 @@ Thumbs.db
 # Node
 node_modules/
 package-lock.json  # or yarn.lock if ya use that
+dist/
 
 # direnv
 .envrc
