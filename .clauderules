@@ -1,0 +1,9 @@
+# Plotter Project Context
+
+## API Reference
+The AxiDraw Python API documentation is available at `docs/axidraw_api.md`. 
+Always reference this file when working with plotter commands.
+
+## Project Structure
+- `plots/` - Individual plot scripts
+- `docs/` - API references and documentation

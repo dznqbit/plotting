@@ -1,0 +1,50 @@
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+bin/
+lib/
+lib64/
+pyvenv.cfg
+include/
+
+# direnv
+.envrc
+.direnv/
+
+# Python stuff
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment variables
+.env
+.env.local
+
+# IDE stuff
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS stuff
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+package-lock.json  # or yarn.lock if ya use that
+
+# direnv
+.envrc
+.direnv/
+
+# Outputs (maybe? or commit them if ya want a gallery)
+*.svg
+*.png
+
+# Environment
+.env
