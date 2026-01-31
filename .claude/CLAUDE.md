@@ -35,7 +35,7 @@ npm run preview    # Preview production build
 4. Click "Export SVG" button (or press 'S') to save vector files for plotting
 
 ### Features
-- SVG export for pen plotting (using p5.js-svg)
+<!-- - SVG export for pen plotting (using p5.js-svg) -->
 - Paper size picker (A4/A2) automatically injected
 - Hot module reload during development
 - All p5.js boilerplate handled by shared layout

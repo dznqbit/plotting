@@ -1,48 +1,78 @@
 import p5 from 'p5'
-import p5SVGInit from 'p5.js-svg'
+import p5SVG from './p5.svg-dual.js'
 import { paperSizes, currentSize } from './paperSizes.js'
 import { createControls } from './controls.js'
 
-p5SVGInit(p5)
+// Initialize p5.js-svg (dual mode for v1 and v2 compatibility)
+p5SVG(p5)
+
+let p5Instance = null
 
 export function initSketch(drawFn) {
-  let p5Instance = null
-
   function exportSVG() {
-    if (!p5Instance) return
-
-    // Save current renderer state
     let size = paperSizes[currentSize]
 
-    console.log('exportSVG: p5Instance.SVG =', p5Instance.SVG)
-    console.log('exportSVG: p5Instance._renderer before =', p5Instance._renderer)
+    // Create hidden container for temporary SVG canvas
+    const hiddenContainer = document.createElement('div')
+    hiddenContainer.style.display = 'none'
+    document.body.appendChild(hiddenContainer)
 
-    // Create temporary SVG canvas
-    p5Instance.createCanvas(size.width, size.height, p5Instance.SVG)
+    // Create a new p5 instance with SVG renderer
+    let svgSketch = (p) => {
+      let canvas;
+      p.setup = () => {
+        p.pixelDensity(1) // Force pixel density to 1 to avoid scaling issues
+        canvas = p.createCanvas(size.width, size.height, p.SVG)
+        canvas.parent(hiddenContainer)
+        
+        // Draw immediately in setup
+        drawFn(p)
 
-    console.log('exportSVG: p5Instance._renderer after createCanvas =', p5Instance._renderer)
-    console.log('exportSVG: p5Instance._renderer.svg =', p5Instance._renderer.svg)
+        // Generate filename with timestamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+        const filename = `plot-${currentSize}-${timestamp}.svg`
 
-    p5Instance.background(255)
-    drawFn(p5Instance) // TEST
+        // Fix the SVG viewBox to match canvas dimensions
+        if (p._renderer.svg) {
+          const svg = p._renderer.svg
 
-    console.log('exportSVG: after draw, svg content =', p5Instance._renderer.svg?.outerHTML?.substring(0, 200))
+          // Use p.width/p.height instead of size since they might differ
+          // Double the viewBox to compensate for 2x scaling in the SVG coordinates
+          svg.setAttribute('viewBox', `0 0 ${p.width * 2} ${p.height * 2}`)
+          svg.setAttribute('width', p.width)
+          svg.setAttribute('height', p.height)
 
-    // Save the SVG using saveSVG() from p5.js-svg
-    let fileName = window.location.pathname.split('/').filter(Boolean).pop() || 'sketch'
-    console.log('exportSVG: calling saveSVG with filename =', fileName)
-    p5Instance.saveSVG(`${fileName}.svg`)
+          const svgData = new XMLSerializer().serializeToString(svg)
+          const blob = new Blob([svgData], { type: 'image/svg+xml' })
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = filename
+          link.click()
+          URL.revokeObjectURL(url)
+        } else {
+          console.error('No SVG element found in renderer!')
+        }
 
-    // Restore regular canvas
-    p5Instance.createCanvas(size.width, size.height)
-    p5Instance.background(255)
-    drawFn(p5Instance)
+        // Remove the temporary canvas and container after a short delay
+        setTimeout(() => {
+          p.remove()
+          canvas.remove()
+          hiddenContainer.remove()
+        }, 100)
+      }
+    }
+
+    // Create temporary p5 instance for SVG export
+    new p5(svgSketch)
   }
 
   // Create the p5 sketch with standard setup
   let sketch = (p) => {
     p.setup = () => {
       let size = paperSizes[currentSize]
+      // Force pixel density to 1 for consistent sizing
+      p.pixelDensity(1)
       // Create regular canvas by default
       p.createCanvas(size.width, size.height)
       p.background(255)
