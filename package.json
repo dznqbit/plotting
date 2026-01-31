@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "new": "node scripts/new-sketch.js"
+    "new": "python scripts/new-sketch.py"
   },
   "repository": {
     "type": "git",

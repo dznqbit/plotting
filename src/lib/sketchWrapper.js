@@ -4,6 +4,7 @@ import { paperSizes, currentSize } from './paperSizes.js'
 import { createControls } from './controls.js'
 
 // Initialize p5.js-svg (dual mode for v1 and v2 compatibility)
+// Nabbed this from https://github.com/bcorporaal/Toko
 p5SVG(p5)
 
 let p5Instance = null
@@ -92,14 +93,19 @@ export function initSketch(drawFn) {
     }
   }
 
+  // Create p5 instance
+  p5Instance = new p5(sketch)
+
   // Create container structure
   const body = document.body
   body.innerHTML = ''
 
-  // Create p5 instance
-  p5Instance = new p5(sketch)
+  // Add nav
+  const nav = document.createElement('nav')
+  nav.innerHTML = '<h1><a href="/" title="Index">Plots</a></h1>'
+  body.appendChild(nav)
 
-  // Add controls with size change and save handlers
+    // Add controls with size change and save handlers
   const controls = createControls(
     (newSize) => {
       p5Instance.resizeCanvas(newSize.width, newSize.height)
@@ -107,7 +113,7 @@ export function initSketch(drawFn) {
     },
     exportSVG
   )
-  body.insertBefore(controls, body.firstChild)
+  body.appendChild(controls, body.firstChild)
 
   // Add main container for p5 canvas
   const main = document.createElement('main')
