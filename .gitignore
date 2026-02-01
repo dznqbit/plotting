@@ -42,9 +42,12 @@ dist/
 .envrc
 .direnv/
 
-# Outputs (maybe? or commit them if ya want a gallery)
+# Outputs
 *.svg
 *.png
 
 # Environment
 .env
+
+# Claude
+settings.local.json

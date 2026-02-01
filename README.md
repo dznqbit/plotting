@@ -26,14 +26,12 @@ Open http://localhost:5173 to view all sketches.
 
 1. Create a new sketch:
 ```bash
-npm run new my-sketch
+npm run new "My Sketch"
 ```
 
 2. Edit `plots/my-sketch/sketch.js` with your p5.js code
 
-3. Add your sketch to `index.html` to list it on the homepage
-
-4. View at http://localhost:5173/plots/my-sketch/
+3. View at http://localhost:5173/plots/my-sketch/
 
 Click "Export SVG" button (or press 'S') to save vector files for plotting.
 
@@ -43,4 +41,3 @@ Click "Export SVG" button (or press 'S') to save vector files for plotting.
 - `src/lib/` - Shared layout components and utilities
 - `docs/` - AxiDraw API documentation
 
-## Projects
