@@ -2423,7 +2423,6 @@ const p5svgInit = (function () {
          * @param {String} [filename]
          * @param {String} [extension] Extension: 'svg' or 'jpg' or 'jpeg' or 'png'
          */
-        console.log("DEFINE SAVESVG")
         p5.prototype.saveSVG = function () {
             var _this = this;
             var args = [];
