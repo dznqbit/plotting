@@ -1,4 +1,5 @@
 import { initSketch } from "../../src/lib/sketchWrapper.js";
+import { intersectTwoCircles } from "../../src/lib/intersectTwoCircles.js"
 
 initSketch((p) => {
   p.stroke(0);
@@ -13,16 +14,26 @@ initSketch((p) => {
   const r = Math.floor(p.width / n);
 
   for (var i = 0; i < n; i++) {
-    const x = 2 * r + ((i % j) / j) * w;
-    const y = 3 * r + (Math.floor(i / j) / j) * h;
+    const x1 = 2 * r + ((i % j) / j) * w;
+    const y1 = 3 * r + (Math.floor(i / j) / j) * h;
 
-    p.push();
-    p.beginClip();
-    p.circle(x, y, r);
-    p.endClip();
+    // Draw the main circle (clip boundary)
+    p.circle(x1, y1, r);
 
-    p.circle(x, y, r);
-    p.circle(x + (16 * (i % j)) / 2, y + 8 * i / j, r);
-    p.pop();
+    // Calculate offset for the second circle
+    const offsetX = (16 * (i % j)) / 2;
+    const offsetY = (8 * i) / j;
+    const x2 = x1 + offsetX;
+    const y2 = y1 + offsetY;
+
+    // Calculate distance between circle centers
+    const dist = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+    // Only draw the second circle if there's overlap
+    if (dist < r) {
+      const [[i1x, i1y], [i2x, i2y]] = intersectTwoCircles(x1, y1, r, x2, y2, r)
+      p.line(i1x,  i1y, i2x, i2y);
+      p.circle(x2, y2, r);
+    }
   }
 });
