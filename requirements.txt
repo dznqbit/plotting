@@ -1,15 +1,28 @@
+asteval==1.0.8
 axicli @ https://cdn.evilmadscientist.com/dl/ad/public/AxiDraw_API.zip#sha256=c29ef0792dc8a2006a3a4abcb306e8d7fa5b93f8ce83c0c781eed226d7eeca24
-axidrawinternal @ file:///private/var/folders/dj/8k4sfdc950x4lx9nwqdwk1zm0000gn/T/pip-req-build-px_94svq/prebuilt_dependencies/axidrawinternal-3.9.6-py2.py3-none-any.whl#sha256=744be32fa64d85adb9dee4d03098af272be4bbf04a0c3dee40b685c3b0d97c4e
+axidrawinternal @ file:///private/var/folders/dj/8k4sfdc950x4lx9nwqdwk1zm0000gn/T/pip-req-build-dnakggsj/prebuilt_dependencies/axidrawinternal-3.9.6-py2.py3-none-any.whl#sha256=744be32fa64d85adb9dee4d03098af272be4bbf04a0c3dee40b685c3b0d97c4e
+cachetools==7.0.0
 certifi==2026.1.4
 charset-normalizer==3.4.4
+click==8.3.1
+dill==0.4.1
 idna==3.11
 ink_extensions==2.2.0
 lxml==6.0.2
+multiprocess==0.70.19
+numpy==2.4.2
 packaging==26.0
 plotink==1.14.0
+pnoise==0.2.0
 pyclipper==1.4.0
+pyphen==0.15.0
 pyserial==3.5
 requests==2.32.5
-tqdm==4.67.1
+scipy==1.17.0
+shapely==2.1.2
+svgelements==1.9.6
+svgwrite==1.4.3
+tomli==2.4.0
+tqdm==4.67.2
 urllib3==2.6.3
-wheel==0.45.1
+vpype==1.15.0
