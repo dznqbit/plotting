@@ -68,15 +68,18 @@ initSketch((p) => {
     const tilt = Math.atan2(pitch, RADIUS * Math.abs(Math.cos(theta)))
 
     // p.scale() runs after p.rotate() below, so it mirrors the glyph in its
-    // own not-yet-rotated space - which, once rotated, reverses the visual
-    // direction of the tilt too. Flipping the tilt's sign to match
-    // foreshorten's sign cancels that out, so the back half leans the same
-    // visual way as the front instead of the opposite way.
-    const tiltSign = Math.sign(foreshorten) || 1
+    // own not-yet-rotated space. A mirror doesn't just negate a direction,
+    // it reflects it (angle phi becomes 180deg - phi) - negating tilt's
+    // sign (as a previous version of this did) doesn't account for that,
+    // so the visual angle still jumped by a large, inconsistent amount at
+    // the equator. Subtracting 180deg instead of negating correctly
+    // compensates for the reflection, keeping the glyph's apparent reading
+    // direction equal to `tilt` continuously on both sides.
+    const rotation = foreshorten >= 0 ? tilt : tilt - Math.PI
 
     p.push()
     p.translate(x, y)
-    p.rotate(tilt * tiltSign)
+    p.rotate(rotation)
     p.scale(foreshorten, 1)
     p.stroke(p.inkColor())
     p.text(ch, 0, 0)
