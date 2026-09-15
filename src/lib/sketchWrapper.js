@@ -13,7 +13,7 @@ let p5Instance = null
 // ever affects the on-screen preview, never the plot itself.
 const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-export function initSketch(drawFn) {
+export function initSketch(drawFn, { preload } = {}) {
   function exportSVG() {
     let size = paperSizes[currentSize]
 
@@ -25,6 +25,9 @@ export function initSketch(drawFn) {
     // Create a new p5 instance with SVG renderer
     let svgSketch = (p) => {
       let canvas;
+      if (preload) {
+        p.preload = () => preload(p)
+      }
       p.setup = () => {
         p.pixelDensity(1) // Force pixel density to 1 to avoid scaling issues
         canvas = p.createCanvas(size.width, size.height, p.SVG)
@@ -83,6 +86,10 @@ export function initSketch(drawFn) {
     p.isDarkMode = darkModeQuery.matches
     p.inkColor = () => (p.isDarkMode ? 255 : 0)
     const paperColor = () => (p.isDarkMode ? 20 : 255)
+
+    if (preload) {
+      p.preload = () => preload(p)
+    }
 
     p.setup = () => {
       let size = paperSizes[currentSize]
