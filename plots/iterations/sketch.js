@@ -2,7 +2,7 @@ import { initSketch } from "../../src/lib/sketchWrapper.js";
 import { intersectTwoCircles } from "../../src/lib/intersectTwoCircles.js"
 
 initSketch((p) => {
-  p.stroke(0);
+  p.stroke(p.inkColor());
   p.strokeWeight(1);
   p.noFill();
 

@@ -45,7 +45,9 @@ sketch_js = """import { initSketch } from '../../src/lib/sketchWrapper.js'
 
 initSketch((p) => {
   // Your sketch here
-  p.stroke(0)
+  // Use p.inkColor() instead of hardcoding black - it flips to white
+  // for the dev-mode dark canvas, but always exports as black ink.
+  p.stroke(p.inkColor())
   p.strokeWeight(2)
   p.noFill()
   p.circle(p.width / 2, p.height / 2, 200)

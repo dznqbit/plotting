@@ -9,6 +9,10 @@ p5SVG(p5)
 
 let p5Instance = null
 
+// Dev-mode dark canvas. Exported SVGs are always black ink, so this only
+// ever affects the on-screen preview, never the plot itself.
+const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
 export function initSketch(drawFn) {
   function exportSVG() {
     let size = paperSizes[currentSize]
@@ -25,7 +29,11 @@ export function initSketch(drawFn) {
         p.pixelDensity(1) // Force pixel density to 1 to avoid scaling issues
         canvas = p.createCanvas(size.width, size.height, p.SVG)
         canvas.parent(hiddenContainer)
-        
+
+        // Export is always print-correct: black ink, regardless of the dev preview theme
+        p.isDarkMode = false
+        p.inkColor = () => 0
+
         // Draw immediately in setup
         drawFn(p)
 
@@ -70,18 +78,24 @@ export function initSketch(drawFn) {
 
   // Create the p5 sketch with standard setup
   let sketch = (p) => {
+    // Dev preview only: inverted "paper" so late-night work is easier on the eyes.
+    // Sketches should draw ink with p.inkColor() instead of hardcoding black.
+    p.isDarkMode = darkModeQuery.matches
+    p.inkColor = () => (p.isDarkMode ? 255 : 0)
+    const paperColor = () => (p.isDarkMode ? 20 : 255)
+
     p.setup = () => {
       let size = paperSizes[currentSize]
       // Force pixel density to 1 for consistent sizing
       p.pixelDensity(1)
       // Create regular canvas by default
       p.createCanvas(size.width, size.height)
-      p.background(255)
+      p.background(paperColor())
       p.noLoop()
     }
 
     p.draw = () => {
-      p.background(255)
+      p.background(paperColor())
       drawFn(p)
     }
 
@@ -91,6 +105,11 @@ export function initSketch(drawFn) {
         return false
       }
     }
+
+    darkModeQuery.addEventListener('change', (e) => {
+      p.isDarkMode = e.matches
+      p.redraw()
+    })
   }
 
   // Create p5 instance

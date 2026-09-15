@@ -2,7 +2,7 @@ import { initSketch } from '../../src/lib/sketchWrapper.js';
 import { intersectTwoCircles } from '../../src/lib/intersectTwoCircles.js';
 
 initSketch((p) => {
-  p.stroke(0);
+  p.stroke(p.inkColor());
   p.strokeWeight(1);
   p.noFill();
 
@@ -14,7 +14,7 @@ initSketch((p) => {
   const r = Math.floor(p.width / n);
 
   for (var i = 0; i < n; i++) {
-    p.stroke(0);
+    p.stroke(p.inkColor());
     const x1 = 2 * r + ((i % j) / j) * w;
     const y1 = 3 * r + (Math.floor(i / j) / j) * h;
 

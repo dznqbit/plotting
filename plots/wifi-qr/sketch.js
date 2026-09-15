@@ -28,12 +28,10 @@ try {
 }
 
 initSketch((p) => {
-  p.background(255);
-
   if (!qrMatrix) {
     p.textAlign(p.CENTER, p.CENTER);
     p.textSize(16);
-    p.fill(0);
+    p.fill(p.inkColor());
     p.text('Loading QR code...', p.width / 2, p.height / 2);
     return;
   }
@@ -50,7 +48,7 @@ initSketch((p) => {
   const startY = (p.height - qrHeight) / 2;
 
   // Draw QR code modules with hatching
-  p.stroke(0);
+  p.stroke(p.inkColor());
   p.strokeWeight(1);
   p.noFill();
   for (let row = 0; row < size; row++) {
@@ -71,6 +69,6 @@ initSketch((p) => {
   // Add label below QR code
   p.textAlign(p.CENTER);
   p.textSize(24);
-  p.fill(0);
+  p.fill(p.inkColor());
   // p.text('WiFi: skattebo', p.width / 2, startY + qrHeight + 40);
 });
