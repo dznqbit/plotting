@@ -48,11 +48,24 @@ export function initSketch(drawFn, { preload } = {}) {
         if (p._renderer.svg) {
           const svg = p._renderer.svg
 
-          // Use p.width/p.height instead of size since they might differ
-          // Double the viewBox to compensate for 2x scaling in the SVG coordinates
-          svg.setAttribute('viewBox', `0 0 ${p.width * 2} ${p.height * 2}`)
-          svg.setAttribute('width', p.width)
-          svg.setAttribute('height', p.height)
+          // Path coordinates are drawn directly in the p.width/p.height
+          // range, so the viewBox has to match that 1:1 - doubling it (as a
+          // previous version of this did) shrinks everything to half scale
+          // and pins it to the top-left corner instead of filling the sheet.
+          svg.setAttribute('viewBox', `0 0 ${p.width} ${p.height}`)
+
+          // Stamp real-world units (mm) on width/height rather than bare
+          // pixel numbers, so consumers (e.g. Inkscape) don't have to guess
+          // a DPI to convert to a physical plot size - a wrong guess there
+          // is a likely source of small, consistent plotted-vs-onscreen
+          // offsets even when the SVG's own coordinates are centered.
+          if (size.widthMm && size.heightMm) {
+            svg.setAttribute('width', `${size.widthMm}mm`)
+            svg.setAttribute('height', `${size.heightMm}mm`)
+          } else {
+            svg.setAttribute('width', p.width)
+            svg.setAttribute('height', p.height)
+          }
 
           const svgData = new XMLSerializer().serializeToString(svg)
           const blob = new Blob([svgData], { type: 'image/svg+xml' })

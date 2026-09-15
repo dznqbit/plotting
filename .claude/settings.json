@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sI -L \"https://github.com/google/fonts/raw/main/ofl/archivoblack/ArchivoBlack-Regular.ttf\")",
+      "Bash(curl -sI -L \"https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf\")",
+      "Bash(curl -sI \"https://raw.githubusercontent.com/google/fonts/main/ofl/archivoblack/ArchivoBlack-Regular.ttf\")",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/google/fonts/main/ofl/archivoblack/ArchivoBlack-Regular.ttf\" -o /Users/dznqbit/code/plotting/plots/cylindrical-text/fonts/ArchivoBlack-Regular.ttf)",
+      "Bash(node --check plots/cylindrical-text/sketch.js)",
+      "Bash(node --check src/lib/sketchWrapper.js)",
+      "Bash(node --check /Users/dznqbit/code/plotting/src/lib/paperSizes.js)",
+      "Bash(node --check /Users/dznqbit/code/plotting/src/lib/controls.js)",
+      "Bash(ls -t ~/Downloads/*.svg 2>/dev/null | head -5)",
+      "Read(//Users/dznqbit/Downloads/**)",
+      "Bash(node --check /Users/dznqbit/code/plotting/src/lib/sketchWrapper.js)",
+      "Bash(node --check /Users/dznqbit/code/plotting/plots/cylindrical-text/sketch.js)"
+    ]
+  }
+}

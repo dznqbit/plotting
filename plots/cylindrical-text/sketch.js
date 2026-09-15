@@ -18,7 +18,7 @@ import fontUrl from './fonts/ArchivoBlack-Regular.ttf'
 // so letters with holes (O, A, B...) render correctly instead of having
 // their inner and outer rings connected by a stray line.
 
-const TEXT = 'YMC YMC YMC YMC YMC YMC YMC YMC'
+const TEXT = 'YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC YMC'
 const FONT_SIZE = 48
 const RADIUS = 150 // cylinder radius, in px
 const PITCH_PER_WRAP = 220 // vertical distance climbed per full revolution - the twist rate
