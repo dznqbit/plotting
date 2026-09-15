@@ -59,28 +59,24 @@ initSketch((p) => {
 
     // Tilt tracks the curve's local slope (dy over dx), same as foreshorten
     // tracks its local width - but using |cos(theta)| instead of the signed
-    // value. The signed version flips ~180deg past the equator (on top of
-    // the mirroring foreshorten already applies), which is what produced the
-    // upside-down text; the unsigned version stays continuous - swinging
-    // toward vertical at the edge-on silhouette, then back to matching the
-    // front-center tilt at back-center - so glyph edges keep lining up into
-    // one ribbon all the way around.
+    // value, so it stays continuous (no sign flips) all the way around:
+    // small near the front/back centers, swinging up toward vertical at the
+    // edge-on silhouette.
     const tilt = Math.atan2(pitch, RADIUS * Math.abs(Math.cos(theta)))
 
-    // p.scale() runs after p.rotate() below, so it mirrors the glyph in its
-    // own not-yet-rotated space. A mirror doesn't just negate a direction,
-    // it reflects it (angle phi becomes 180deg - phi) - negating tilt's
-    // sign (as a previous version of this did) doesn't account for that,
-    // so the visual angle still jumped by a large, inconsistent amount at
-    // the equator. Subtracting 180deg instead of negating correctly
-    // compensates for the reflection, keeping the glyph's apparent reading
-    // direction equal to `tilt` continuously on both sides.
-    const rotation = foreshorten >= 0 ? tilt : tilt - Math.PI
-
+    // Order matters here: rotating a glyph and THEN mirroring it (mirroring
+    // the already-tilted shape, in world space) keeps its "up" direction
+    // pointing up on both sides - only its left/right lean and reading
+    // order flip. Mirroring first and rotating second (what earlier
+    // versions did) mirrors the glyph before it's tilted, so the tilt gets
+    // applied to already-mirrored content - which is what turned into
+    // upside-down text on the back. The LAST-called of p.rotate()/p.scale()
+    // is applied to the glyph first, so p.scale() has to be called first
+    // here to get rotate-then-mirror.
     p.push()
     p.translate(x, y)
-    p.rotate(rotation)
     p.scale(foreshorten, 1)
+    p.rotate(tilt)
     p.stroke(p.inkColor())
     p.text(ch, 0, 0)
     p.pop()
