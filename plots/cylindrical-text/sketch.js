@@ -1,5 +1,5 @@
 import { initSketch } from '../../src/lib/sketchWrapper.js'
-import fontUrl from './fonts/ArchivoBlack-Regular.ttf'
+import fontUrl from '../../src/fonts/ArchivoBlack-Regular.ttf'
 
 // Wrap text helically around an imaginary vertical cylinder, viewed face-on -
 // like the diagonal candy-stripe on a candy cane. Text spirals around the
@@ -23,6 +23,7 @@ const FONT_SIZE = 48
 const RADIUS = 150 // cylinder radius, in px
 const PITCH_PER_WRAP = 220 // vertical distance climbed per full revolution - the twist rate
 const MIN_FORESHORTEN = 0.08 // hide glyphs squished thinner than this, right at the silhouette
+const FLIP_HORIZONTAL = false // mirror the whole design across a vertical centerline
 
 // Transforms a local glyph-outline point the same way the flat p.text()
 // version did: rotate first, THEN mirror/foreshorten (in the now-rotated
@@ -31,12 +32,21 @@ const MIN_FORESHORTEN = 0.08 // hide glyphs squished thinner than this, right at
 // front and back of the cylinder - mirroring first (rotating the already-
 // mirrored shape) is what caused the back half to lean the wrong way and
 // the Z-twist near the edges.
-function transformPoint(px, py, { tilt, foreshorten, x, y }) {
+function transformPoint(px, py, { tilt, foreshorten, x, y, flipAroundX }) {
   const rx = px * Math.cos(tilt) - py * Math.sin(tilt)
   const ry = px * Math.sin(tilt) + py * Math.cos(tilt)
   const sx = rx * foreshorten
   const sy = ry
-  return [x + sx, y + sy]
+  let wx = x + sx
+  const wy = y + sy
+  // Mirroring the fully-transformed point (rather than folding the flip
+  // into RADIUS/theta upstream) reflects whatever was already correctly
+  // computed, so it can't reintroduce the rotation-direction bugs the
+  // tilt/foreshorten math went through earlier.
+  if (flipAroundX !== undefined) {
+    wx = 2 * flipAroundX - wx
+  }
+  return [wx, wy]
 }
 
 // Draws one character's glyph outline (possibly multiple contours, e.g. the
@@ -123,7 +133,13 @@ initSketch(
 
       p.stroke(p.inkColor())
       const glyphPath = font.font.getPath(ch, 0, 0, FONT_SIZE)
-      drawGlyph(p, glyphPath, w / 2, verticalCenter, { tilt, foreshorten, x, y })
+      drawGlyph(p, glyphPath, w / 2, verticalCenter, {
+        tilt,
+        foreshorten,
+        x,
+        y,
+        flipAroundX: FLIP_HORIZONTAL ? centerX : undefined,
+      })
     }
   },
   {

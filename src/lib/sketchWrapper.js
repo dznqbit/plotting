@@ -13,6 +13,39 @@ let p5Instance = null
 // ever affects the on-screen preview, never the plot itself.
 const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
+const INKSCAPE_NS = 'http://www.inkscape.org/namespaces/inkscape'
+const SVG_NS = 'http://www.w3.org/2000/svg'
+
+// Builds a p.withLayer(name, drawFn) for SVG export: shapes drawn inside
+// drawFn land in a top-level <g inkscape:groupmode="layer"> named `name`,
+// instead of the flat default group - so AxiDraw's "layers" plot mode (or
+// just Inkscape's layer panel) can address them separately, e.g. for a
+// pen-color change partway through a plot. AxiDraw's layers mode expects a
+// leading number in the layer name (e.g. "1-Text"), so `name` should
+// include one. Calling it again with the same name reuses that layer
+// rather than creating a duplicate.
+function makeLayerHelper(p) {
+  const svg = p._renderer.svg
+  const ctx = p._renderer.drawingContext
+  svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:inkscape', INKSCAPE_NS)
+  const layers = {}
+
+  return (name, drawFn) => {
+    let group = layers[name]
+    if (!group) {
+      group = document.createElementNS(SVG_NS, 'g')
+      group.setAttributeNS(INKSCAPE_NS, 'inkscape:groupmode', 'layer')
+      group.setAttributeNS(INKSCAPE_NS, 'inkscape:label', name)
+      svg.appendChild(group)
+      layers[name] = group
+    }
+    const previousElement = ctx.__currentElement
+    ctx.__currentElement = group
+    drawFn()
+    ctx.__currentElement = previousElement
+  }
+}
+
 export function initSketch(drawFn, { preload } = {}) {
   function exportSVG() {
     let size = paperSizes[currentSize]
@@ -36,6 +69,8 @@ export function initSketch(drawFn, { preload } = {}) {
         // Export is always print-correct: black ink, regardless of the dev preview theme
         p.isDarkMode = false
         p.inkColor = () => 0
+
+        p.withLayer = makeLayerHelper(p)
 
         // Draw immediately in setup
         drawFn(p)
@@ -99,6 +134,9 @@ export function initSketch(drawFn, { preload } = {}) {
     p.isDarkMode = darkModeQuery.matches
     p.inkColor = () => (p.isDarkMode ? 255 : 0)
     const paperColor = () => (p.isDarkMode ? 20 : 255)
+
+    // No layer concept on the regular canvas preview - just draw normally
+    p.withLayer = (name, fn) => fn()
 
     if (preload) {
       p.preload = () => preload(p)

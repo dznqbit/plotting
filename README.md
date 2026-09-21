@@ -2,9 +2,15 @@
 Generative art projects for the Uunatek iDraw H SE A2 plotter.
 
 Two ways to build sketches
-- [Axidraw Python API](https://axidraw.com/doc/py_api/)
-- [P5.js](https://p5js.org)
-  - [Uunatek article](https://uunatek.com/blogs/tips-and-tricks/how-to-code-digital-art-with-p5-js)
+## [Axidraw Python API](https://axidraw.com/doc/py_api/)
+We haven't done much here yet.
+
+### [P5.js](https://p5js.org)
+Drawing inspiration from this [Uunatek article](https://uunatek.com/blogs/tips-and-tricks/how-to-code-digital-art-with-p5-js), the standard flow is:
+- Use [P5.js](https://p5js.org/reference/) to draw the shape on browser canvas.
+- Use [p5.js-svg](https://github.com/zenozeng/p5.js-svg) to export the drawing as an SVG, targeting Inkscape.
+- Open SVG in Inkscape and draw SVG
+
 
 ## Setup
 ```bash

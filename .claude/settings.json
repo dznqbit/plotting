@@ -15,7 +15,10 @@
       "Bash(ls -t ~/Downloads/*.svg 2>/dev/null | head -5)",
       "Read(//Users/dznqbit/Downloads/**)",
       "Bash(node --check /Users/dznqbit/code/plotting/src/lib/sketchWrapper.js)",
-      "Bash(node --check /Users/dznqbit/code/plotting/plots/cylindrical-text/sketch.js)"
+      "Bash(node --check /Users/dznqbit/code/plotting/plots/cylindrical-text/sketch.js)",
+      "Bash(git mv *)",
+      "Bash(node --check /Users/dznqbit/code/plotting/plots/ymc-manifesto/sketch.js)",
+      "Bash(node --check /Users/dznqbit/code/plotting/plots/ymc-manifesto-ii/sketch.js)"
     ]
   }
 }

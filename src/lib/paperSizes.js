@@ -8,7 +8,7 @@ export const paperSizes = {
   '7x10': { width: 673, height: 960, widthMm: 178, heightMm: 254, label: '7x10 (178 x 254 mm)' }
 }
 
-export let currentSize = 'A4'
+export let currentSize = '7x10'
 
 export function setCurrentSize(size) {
   currentSize = size
