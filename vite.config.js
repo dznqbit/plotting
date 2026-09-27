@@ -23,7 +23,20 @@ function getSketchEntries() {
   return entries
 }
 
+// Viewport.js lives in a sibling checkout (../Viewport.js), outside the Vite root
+const viewportDir = resolve(__dirname, '../Viewport.js')
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      viewport: resolve(viewportDir, 'src/viewport.js')
+    }
+  },
+  server: {
+    fs: {
+      allow: [__dirname, viewportDir]
+    }
+  },
   build: {
     rollupOptions: {
       input: getSketchEntries()
