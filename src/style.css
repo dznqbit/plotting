@@ -47,12 +47,35 @@ body {
   border-radius: 4px;
   box-shadow: 0 2px 10px var(--shadow);
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#controls .controls-row {
+  display: flex;
   align-items: center;
   gap: 15px;
 }
 
 #controls label {
   margin: 0;
+}
+
+#controls input[type="text"] {
+  flex: 1;
+  min-width: 16em;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+#controls input[readonly] {
+  background: var(--bg);
+  color: var(--text-muted);
+  font-family: ui-monospace, Menlo, monospace;
 }
 
 #controls select {

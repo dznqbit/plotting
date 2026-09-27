@@ -48,7 +48,7 @@ function makeLayerHelper(p) {
 }
 
 export function initSketch(drawFn, { preload } = {}) {
-  function exportSVG() {
+  function exportSVG(baseName) {
     let size = paperSizes[currentSize]
 
     // Create hidden container for temporary SVG canvas
@@ -76,9 +76,7 @@ export function initSketch(drawFn, { preload } = {}) {
         // Draw immediately in setup
         drawFn({ p, v: makeViewport(p) })
 
-        // Generate filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-        const filename = `plot-${currentSize}-${timestamp}.svg`
+        const filename = `${baseName || `plot-${currentSize}`}.svg`
 
         // Fix the SVG viewBox to match canvas dimensions
         if (p._renderer.svg) {
@@ -159,8 +157,12 @@ export function initSketch(drawFn, { preload } = {}) {
     }
 
     p.keyPressed = () => {
+      // Don't hijack typing in the filename field
+      const active = document.activeElement
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return
+
       if (p.key === 's' || p.key === 'S') {
-        exportSVG()
+        controls.save()
         return false
       }
     }
