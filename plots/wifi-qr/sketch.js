@@ -27,7 +27,7 @@ try {
   console.error('QR Code generation failed:', err);
 }
 
-initSketch((p) => {
+initSketch(({ p }) => {
   if (!qrMatrix) {
     p.textAlign(p.CENTER, p.CENTER);
     p.textSize(16);

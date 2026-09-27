@@ -1,6 +1,6 @@
 import { initSketch } from '../../src/lib/sketchWrapper.js'
 
-initSketch((p) => {
+initSketch(({ p }) => {
   p.stroke(p.inkColor())
   p.strokeWeight(10)
   p.noFill()

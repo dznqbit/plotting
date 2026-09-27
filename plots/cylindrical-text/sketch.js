@@ -84,7 +84,7 @@ function drawGlyph(p, glyphPath, offsetX, offsetY, placement) {
 }
 
 initSketch(
-  (p) => {
+  ({ p }) => {
     const font = p.loadedFont
     p.textFont(font)
     p.textSize(FONT_SIZE)

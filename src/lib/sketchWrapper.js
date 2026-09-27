@@ -73,7 +73,7 @@ export function initSketch(drawFn, { preload } = {}) {
         p.withLayer = makeLayerHelper(p)
 
         // Draw immediately in setup
-        drawFn(p)
+        drawFn({ p })
 
         // Generate filename with timestamp
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
@@ -154,7 +154,7 @@ export function initSketch(drawFn, { preload } = {}) {
 
     p.draw = () => {
       p.background(paperColor())
-      drawFn(p)
+      drawFn({ p })
     }
 
     p.keyPressed = () => {
