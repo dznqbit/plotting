@@ -1,3 +1,4 @@
+import './errorToast.js'
 import p5 from 'p5'
 import p5SVG from './p5.svg-dual.js'
 import { paperSizes, currentSize } from './paperSizes.js'

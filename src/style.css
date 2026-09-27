@@ -149,3 +149,56 @@ main {
   margin: 0;
   color: var(--text-muted);
 }
+
+/* Uncaught error toasts (see src/lib/errorToast.js) */
+#error-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(720px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.error-toast {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  background: #b00020;
+  color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px var(--shadow-hover);
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.error-toast.clickable {
+  cursor: pointer;
+}
+
+.error-toast.clickable:hover {
+  background: #8c0019;
+}
+
+.error-toast-message {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.error-toast-location {
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.error-toast-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
