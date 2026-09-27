@@ -3,11 +3,14 @@ import { paperSizes, currentSize, setCurrentSize } from './paperSizes.js'
 export function createControls(onSizeChange, onSave) {
   const controls = document.createElement('div')
   controls.id = 'controls'
+  const options = Object.entries(paperSizes)
+    .map(([key, size]) => `<option value="${key}">${size.label}</option>`)
+    .join('')
+
   controls.innerHTML = `
     <label for="paperSize">Paper Size:</label>
     <select id="paperSize">
-      <option value="A4">A4 (210 x 297 mm)</option>
-      <option value="A2">A2 (420 x 594 mm)</option>
+      ${options}
     </select>
     <button id="saveButton">Export SVG</button>
   `
