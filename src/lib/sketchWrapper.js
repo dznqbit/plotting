@@ -2,7 +2,8 @@ import p5 from 'p5'
 import p5SVG from './p5.svg-dual.js'
 import { paperSizes, currentSize } from './paperSizes.js'
 import { createControls } from './controls.js'
-import { makeViewport } from './viewport.js'
+import * as Viewport from 'viewport'
+import { ViewportHelper } from './viewportHelper.js'
 
 // Initialize p5.js-svg (dual mode for v1 and v2 compatibility)
 // Nabbed this from https://github.com/bcorporaal/Toko
@@ -74,7 +75,7 @@ export function initSketch(drawFn, { preload } = {}) {
         p.withLayer = makeLayerHelper(p)
 
         // Draw immediately in setup
-        drawFn({ p, v: makeViewport(p) })
+        drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
 
         const filename = `${baseName || `plot-${currentSize}`}.svg`
 
@@ -153,7 +154,7 @@ export function initSketch(drawFn, { preload } = {}) {
 
     p.draw = () => {
       p.background(paperColor())
-      drawFn({ p, v: makeViewport(p) })
+      drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
     }
 
     p.keyPressed = () => {
