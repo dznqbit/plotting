@@ -1,6 +1,6 @@
 import { initSketch } from '../../src/lib/sketchWrapper.js'
 
-initSketch((p) => {
+initSketch(({ p }) => {
   // Multi-layer circles
   p.stroke(p.inkColor())
   p.strokeWeight(2)

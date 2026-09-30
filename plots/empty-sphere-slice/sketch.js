@@ -1,7 +1,7 @@
 import { rayAndCircleIntersectionPoints } from '../../src/lib/intersectRayAndCircle.js';
 import { initSketch } from '../../src/lib/sketchWrapper.js';
 
-initSketch((p) => {
+initSketch(({ p }) => {
   const W = p.width;
   const H = p.height;
 

@@ -1,7 +1,10 @@
+import './errorToast.js'
 import p5 from 'p5'
 import p5SVG from './p5.svg-dual.js'
 import { paperSizes, currentSize } from './paperSizes.js'
 import { createControls } from './controls.js'
+import * as Viewport from 'viewport'
+import { ViewportHelper } from './viewportHelper.js'
 
 // Initialize p5.js-svg (dual mode for v1 and v2 compatibility)
 // Nabbed this from https://github.com/bcorporaal/Toko
@@ -47,7 +50,7 @@ function makeLayerHelper(p) {
 }
 
 export function initSketch(drawFn, { preload } = {}) {
-  function exportSVG() {
+  function exportSVG(baseName) {
     let size = paperSizes[currentSize]
 
     // Create hidden container for temporary SVG canvas
@@ -73,11 +76,9 @@ export function initSketch(drawFn, { preload } = {}) {
         p.withLayer = makeLayerHelper(p)
 
         // Draw immediately in setup
-        drawFn(p)
+        drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
 
-        // Generate filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-        const filename = `plot-${currentSize}-${timestamp}.svg`
+        const filename = `${baseName || `plot-${currentSize}`}.svg`
 
         // Fix the SVG viewBox to match canvas dimensions
         if (p._renderer.svg) {
@@ -154,12 +155,16 @@ export function initSketch(drawFn, { preload } = {}) {
 
     p.draw = () => {
       p.background(paperColor())
-      drawFn(p)
+      drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
     }
 
     p.keyPressed = () => {
+      // Don't hijack typing in the filename field
+      const active = document.activeElement
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return
+
       if (p.key === 's' || p.key === 'S') {
-        exportSVG()
+        controls.save()
         return false
       }
     }

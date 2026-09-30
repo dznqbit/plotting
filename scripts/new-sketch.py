@@ -43,7 +43,7 @@ index_html = f"""<!DOCTYPE html>
 # Create sketch.js
 sketch_js = """import { initSketch } from '../../src/lib/sketchWrapper.js'
 
-initSketch((p) => {
+initSketch(({ p }) => {
   // Your sketch here
   // Use p.inkColor() instead of hardcoding black - it flips to white
   // for the dev-mode dark canvas, but always exports as black ink.
