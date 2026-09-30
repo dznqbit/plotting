@@ -43,14 +43,30 @@ index_html = f"""<!DOCTYPE html>
 # Create sketch.js
 sketch_js = """import { initSketch } from '../../src/lib/sketchWrapper.js'
 
-initSketch(({ p }) => {
+initSketch(({ p, v, vh }) => {
   // Your sketch here
+
   // Use p.inkColor() instead of hardcoding black - it flips to white
   // for the dev-mode dark canvas, but always exports as black ink.
   p.stroke(p.inkColor())
   p.strokeWeight(2)
   p.noFill()
-  p.circle(p.width / 2, p.height / 2, 200)
+
+  // --- 3D: Viewport scene (vh) ---
+  // Shapes live in world units (vh.cube() is 2 across), +Z up, placed with
+  // vh.translate/rotate/scale - a separate stack from p5's push/pop.
+  // Nothing is drawn until vh.render(), which projects the scene through
+  // the camera and removes hidden lines, returning 2D Paths sized to the
+  // canvas. vh.draw() then strokes them with the current p5 stroke.
+  vh.scene.add(vh.cube())
+  const paths = vh.render({ eye: vh.vec(4, 4, 4) })
+  vh.draw(paths)
+
+  // --- 2D: native p5 ---
+  // Draws immediately in canvas pixels (origin top-left, Y down), using
+  // p5's own transforms. Flat ink on top of the render: it is not
+  // occluded by, and does not occlude, anything in the 3D scene.
+  p.circle(100, 100, 100)
 })
 """
 
