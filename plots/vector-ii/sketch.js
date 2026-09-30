@@ -11,8 +11,8 @@ initSketch(({ p, v, vh }) => {
   vh.pop();
 
   vh.push();
-  vh.translate(-86, -100, -70);
-  vh.scale(60, 10, 1);
+  vh.translate(-86, -101, -70);
+  vh.scale(60, 5, 1);
   coll.push(vh.transform(vh.cube()));
   vh.scene.add(vh.cube());
   vh.pop();
@@ -32,7 +32,7 @@ initSketch(({ p, v, vh }) => {
   vh.pop();
 
   vh.translate(-45, -45);
-  vh.scale(1, 1, 20);
+  // vh.scale(1, 1, 20);
   vh.translate(0, 0, -4);
 
   // vh.push();
@@ -49,21 +49,50 @@ initSketch(({ p, v, vh }) => {
 
   for (let j = 0, mj = 4; j < mj; ++j) {
     for (let i = 0, mi = 6; i < mi; ++i) {
+      let cubeWidth = 2;
+      let cubeDepth = 2;
+      let cubeHeight = 8;
+
+      let cubeZ = 52;
+
+      switch (j) {
+        case 0:
+          cubeHeight = 4;
+          cubeZ = 47;
+          break;
+
+        case 1:
+          cubeHeight = 4;
+          cubeZ = 53;
+          break;
+
+        case 2:
+          cubeHeight = 8;
+          cubeZ = 48;
+          break;
+
+        case 3:
+          cubeHeight = 2;
+          cubeZ = 54;
+          break;
+      }
+
       vh.push();
 
       vh.scale(2);
-      vh.translate(-8 * i, -14 * j, 0);
+      vh.translate(-8 * i, -14 * j, 10 * j - cubeZ);
 
       if (i % 2 == 0) {
         vh.rotateZ(16 * j); // i**2 * (2 + 1 * mj + 0.00277 * mi));
       }
 
       if (i == 1 && j == 1) {
-        coll.push(vh.transform(vh.cylinder()));
-        vh.scene.add(vh.cylinder());
+        const c = vh.cylinder(1, cubeHeight);
+        coll.push(vh.transform(c));
+        vh.scene.add(c);
       } else {
         // coll.push(vh.transform(vh.cube()));
-        vh.scene.add(vh.cube());
+        vh.scene.add(vh.cube(cubeWidth, cubeDepth, cubeHeight));
       }
 
       // vh.rotateX(60)
