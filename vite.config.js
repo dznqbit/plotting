@@ -25,16 +25,22 @@ function getSketchEntries() {
 
 // Viewport.js lives in a sibling checkout (../Viewport.js), outside the Vite root
 const viewportDir = resolve(__dirname, '../Viewport.js')
+// Same for Toko (../Toko) - aliased to its source root, not the dist bundle
+const tokoDir = resolve(__dirname, '../Toko')
 
 export default defineConfig({
   resolve: {
-    alias: {
-      viewport: resolve(viewportDir, 'src/viewport.js')
-    }
+    alias: [
+      { find: 'viewport', replacement: resolve(viewportDir, 'src/viewport.js') },
+      { find: 'toko', replacement: resolve(tokoDir, 'src') },
+      // Toko imports a vendored CommonJS build of chroma.js, which the dev
+      // server serves as-is (no default export) - swap in the npm ESM build
+      { find: /^.*\/assets\/js\/chroma\/[^/]+\/chroma\.min\.cjs$/, replacement: resolve(__dirname, 'node_modules/chroma-js/index.js') }
+    ]
   },
   server: {
     fs: {
-      allow: [__dirname, viewportDir]
+      allow: [__dirname, viewportDir, tokoDir]
     }
   },
   build: {

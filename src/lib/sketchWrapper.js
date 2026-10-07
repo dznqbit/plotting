@@ -5,6 +5,7 @@ import { paperSizes, currentSize } from './paperSizes.js'
 import { createControls } from './controls.js'
 import * as Viewport from 'viewport'
 import { ViewportHelper } from './viewportHelper.js'
+import { createToko } from './tokoHelper.js'
 
 // Initialize p5.js-svg (dual mode for v1 and v2 compatibility)
 // Nabbed this from https://github.com/bcorporaal/Toko
@@ -49,7 +50,34 @@ function makeLayerHelper(p) {
   }
 }
 
-export function initSketch(drawFn, { preload } = {}) {
+/**
+ * Optional libraries a sketch can opt into. Each one adds extra args to the
+ * draw callback:
+ * - 'viewport': `v` (raw Viewport.js) and `vh` (ViewportHelper)
+ * - 'toko': `toko` (Toko, with functions bound to `p`)
+ * @typedef {'viewport' | 'toko'} Includes
+ */
+
+/**
+ * @param {object} params
+ * @param {(args: object) => void} params.draw
+ * @param {(p: object) => void} [params.preload]
+ * @param {Includes[]} [params.includes]
+ */
+export function initSketch({ draw: drawFn, preload, includes = [] } = {}) {
+  // Assemble the draw callback's args, only adding what the sketch asked for
+  function drawArgs(p) {
+    const args = { p }
+    if (includes.includes('viewport')) {
+      args.v = Viewport
+      args.vh = new ViewportHelper(p)
+    }
+    if (includes.includes('toko')) {
+      args.toko = createToko(p)
+    }
+    return args
+  }
+
   function exportSVG(baseName) {
     let size = paperSizes[currentSize]
 
@@ -76,7 +104,7 @@ export function initSketch(drawFn, { preload } = {}) {
         p.withLayer = makeLayerHelper(p)
 
         // Draw immediately in setup
-        drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
+        drawFn(drawArgs(p))
 
         const filename = `${baseName || `plot-${currentSize}`}.svg`
 
@@ -155,7 +183,7 @@ export function initSketch(drawFn, { preload } = {}) {
 
     p.draw = () => {
       p.background(paperColor())
-      drawFn({ p, v: Viewport, vh: new ViewportHelper(p) })
+      drawFn(drawArgs(p))
     }
 
     p.keyPressed = () => {

@@ -27,48 +27,50 @@ try {
   console.error('QR Code generation failed:', err);
 }
 
-initSketch(({ p }) => {
-  if (!qrMatrix) {
-    p.textAlign(p.CENTER, p.CENTER);
-    p.textSize(16);
-    p.fill(p.inkColor());
-    p.text('Loading QR code...', p.width / 2, p.height / 2);
-    return;
-  }
+initSketch({
+  draw: ({ p }) => {
+    if (!qrMatrix) {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textSize(16);
+      p.fill(p.inkColor());
+      p.text('Loading QR code...', p.width / 2, p.height / 2);
+      return;
+    }
 
-  console.log('Drawing QR matrix:', qrMatrix);
+    console.log('Drawing QR matrix:', qrMatrix);
 
-  // Calculate QR code dimensions
-  const size = qrMatrix.size;
-  const qrWidth = size * moduleSize;
-  const qrHeight = size * moduleSize;
+    // Calculate QR code dimensions
+    const size = qrMatrix.size;
+    const qrWidth = size * moduleSize;
+    const qrHeight = size * moduleSize;
 
-  // Center the QR code
-  const startX = (p.width - qrWidth) / 2;
-  const startY = (p.height - qrHeight) / 2;
+    // Center the QR code
+    const startX = (p.width - qrWidth) / 2;
+    const startY = (p.height - qrHeight) / 2;
 
-  // Draw QR code modules with hatching
-  p.stroke(p.inkColor());
-  p.strokeWeight(1);
-  p.noFill();
-  for (let row = 0; row < size; row++) {
-    for (let col = 0; col < size; col++) {
-      const index = row * size + col;
-      if (qrMatrix.data[index]) {
-        const x = startX + col * moduleSize;
-        const y = startY + row * moduleSize;
+    // Draw QR code modules with hatching
+    p.stroke(p.inkColor());
+    p.strokeWeight(1);
+    p.noFill();
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        const index = row * size + col;
+        if (qrMatrix.data[index]) {
+          const x = startX + col * moduleSize;
+          const y = startY + row * moduleSize;
 
-        // Draw horizontal hatch lines
-        for (let ly = y; ly <= y + moduleSize; ly += hatchSpacing) {
-          p.line(x, ly, x + moduleSize, ly);
+          // Draw horizontal hatch lines
+          for (let ly = y; ly <= y + moduleSize; ly += hatchSpacing) {
+            p.line(x, ly, x + moduleSize, ly);
+          }
         }
       }
     }
-  }
 
-  // Add label below QR code
-  p.textAlign(p.CENTER);
-  p.textSize(24);
-  p.fill(p.inkColor());
-  // p.text('WiFi: skattebo', p.width / 2, startY + qrHeight + 40);
+    // Add label below QR code
+    p.textAlign(p.CENTER);
+    p.textSize(24);
+    p.fill(p.inkColor());
+    // p.text('WiFi: skattebo', p.width / 2, startY + qrHeight + 40);
+  },
 });

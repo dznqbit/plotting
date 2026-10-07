@@ -95,8 +95,8 @@ function drawGlyph(p, glyphPath, offsetX, offsetY, placement) {
   if (open) p.endShape(p.CLOSE);
 }
 
-initSketch(
-  ({ p }) => {
+initSketch({
+  draw: ({ p }) => {
     const font = p.loadedFont;
     p.textFont(font);
     p.textSize(FONT_SIZE);
@@ -194,9 +194,7 @@ initSketch(
       });
     }
   },
-  {
-    preload: (p) => {
-      p.loadedFont = p.loadFont(fontUrl);
-    },
-  }
-);
+  preload: (p) => {
+    p.loadedFont = p.loadFont(fontUrl);
+  },
+});
