@@ -74,6 +74,12 @@ const STEM_RADII = [0.1, 0.09, 0.08, 0.075];
 const STEM_LINES = 4;
 const RING_SAMPLES = 32; // vertices for the stem's cut-off top
 
+// Cut line: where you'd carve off the lid. A dashed ring around the body,
+// plotted with its own pen.
+const CUT_LEVEL = 0.99; // fraction of the body's height, from the bottom
+const DASH = 5; // px
+const DASH_GAP = 10; // px
+
 // Hidden-line removal for the tilted view, via a depth buffer: the body and
 // stem surfaces are sampled densely and splatted into a coarse screen grid
 // that remembers the nearest depth per cell. A line point is visible if
@@ -146,6 +152,27 @@ function stemPoint(i, phi) {
   const r = STEM_RADII[i];
   return { x: x + r * Math.cos(phi), y, z: z + r * Math.sin(phi) };
 }
+
+// The cut ring's height, and its seam radius there: where the profile's outer
+// wall (past the shoulder's peak) comes down through that height.
+const CUT = (() => {
+  const STEPS = 1000;
+  const ys = Array.from({ length: STEPS + 1 }, (_, i) => evalProfile(i / STEPS).y);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+  const y = yMin + CUT_LEVEL * (yMax - yMin);
+  let i = ys.indexOf(yMax);
+  while (i < STEPS && ys[i + 1] >= y) i++;
+  // Bisect between the last sample above and the first below
+  let lo = i / STEPS;
+  let hi = (i + 1) / STEPS;
+  for (let k = 0; k < 30; k++) {
+    const mid = (lo + hi) / 2;
+    if (evalProfile(mid).y >= y) lo = mid;
+    else hi = mid;
+  }
+  return { y, r: evalProfile(lo).r };
+})();
 
 function sweep({ r, y }, theta) {
   return { x: r * Math.cos(theta), y, z: r * Math.sin(theta) };
@@ -324,6 +351,50 @@ initSketch({
         p.stroke(p.inkColor());
         drawStem(style, yaw, toScreen, pen);
       });
+      p.withLayer('3-Cut', () => {
+        p.stroke(p.inkColor());
+        drawCut(style, pen);
+      });
+    }
+
+    // Draws a screen-space polyline, solid or chopped into dashes by arc length
+    function polyline(pts, { closed = false, dashed = false } = {}) {
+      if (!dashed) {
+        p.beginShape();
+        for (const [x, y] of pts) p.vertex(x, y);
+        p.endShape(closed ? p.CLOSE : undefined);
+        return;
+      }
+      const path = closed ? [...pts, pts[0]] : pts;
+      const period = DASH + DASH_GAP;
+      let along = 0; // arc length so far
+      let dash = null;
+      const flushDash = () => {
+        if (dash && dash.length > 1) polyline(dash);
+        dash = null;
+      };
+      for (let i = 1; i < path.length; i++) {
+        const [ax, ay] = path[i - 1];
+        const [bx, by] = path[i];
+        const len = Math.hypot(bx - ax, by - ay);
+        let s = 0;
+        while (s < len) {
+          // Distance to the next on/off switch along this segment
+          const phase = (along + s) % period;
+          const on = phase < DASH;
+          const step = Math.min(len - s, (on ? DASH : period) - phase);
+          const at = (f) => [ax + (bx - ax) * f, ay + (by - ay) * f];
+          if (on) {
+            if (!dash) dash = [at(s / len)];
+            dash.push(at((s + step) / len));
+          } else {
+            flushDash();
+          }
+          s += step;
+        }
+        along += len;
+      }
+      flushDash();
     }
 
     // Draws 3D curves, keeping only the parts `visible` passes (all of them if
@@ -352,9 +423,9 @@ initSketch({
         }
       };
 
-      const loop3 = (pts3, subdivisions = 8) => {
+      const loop3 = (pts3, subdivisions = 8, { dashed = false } = {}) => {
         if (!visible) {
-          closedPath(pts3.map(toScreen));
+          polyline(pts3.map(toScreen), { closed: true, dashed });
           return;
         }
         // Densify each edge so visibility can change partway along it
@@ -368,17 +439,13 @@ initSketch({
         const shown = despeckle(dense.map(visible), true);
         const firstHidden = shown.indexOf(false);
         if (firstHidden < 0) {
-          closedPath(dense.map(toScreen));
+          polyline(dense.map(toScreen), { closed: true, dashed });
           return;
         }
         // Walk once around, starting from a hidden point so no run wraps
         let run = [];
         const flush = () => {
-          if (run.length > 1) {
-            p.beginShape();
-            for (const [x, y] of run) p.vertex(x, y);
-            p.endShape();
-          }
+          if (run.length > 1) polyline(run, { dashed });
           run = [];
         };
         for (let n = 1; n <= dense.length; n++) {
@@ -466,6 +533,18 @@ initSketch({
         }
       }
       return best.filter(Boolean).map((b) => b.pt);
+    }
+
+    function drawCut(style, pen) {
+      // Edge-on in elevation, where it would just be a level line; skip it
+      if (style === 'elevation') return;
+      // Plan and tilted: the lobed ring itself (clipped, in the tilted view)
+      const ring = [];
+      for (let k = 0; k < OUTLINE_SAMPLES; k++) {
+        const theta = (k / OUTLINE_SAMPLES) * p.TWO_PI;
+        ring.push(sweep({ r: CUT.r * lobeScale(theta), y: CUT.y }, theta));
+      }
+      pen.loop3(ring, 1, { dashed: true });
     }
 
     function drawStem(style, yaw, toScreen, pen) {
