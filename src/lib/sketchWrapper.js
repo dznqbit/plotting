@@ -53,7 +53,8 @@ function makeLayerHelper(p) {
 /**
  * Optional libraries a sketch can opt into. Each one adds extra args to the
  * draw callback:
- * - 'viewport': `v` (raw Viewport.js) and `vh` (ViewportHelper)
+ * - 'viewport': `viewport`, holding `viewport` (raw Viewport.js) and
+ *   `viewportHelper` (ViewportHelper)
  * - 'toko': `toko` (Toko, with functions bound to `p`)
  * @typedef {'viewport' | 'toko'} Includes
  */
@@ -69,8 +70,7 @@ export function initSketch({ draw: drawFn, preload, includes = [] } = {}) {
   function drawArgs(p) {
     const args = { p }
     if (includes.includes('viewport')) {
-      args.v = Viewport
-      args.vh = new ViewportHelper(p)
+      args.viewport = { viewport: Viewport, viewportHelper: new ViewportHelper(p) }
     }
     if (includes.includes('toko')) {
       args.toko = createToko(p)

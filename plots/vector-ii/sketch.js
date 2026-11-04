@@ -2,7 +2,7 @@ import { initSketch } from '../../src/lib/sketchWrapper.js';
 
 initSketch({
   includes: ['viewport'],
-  draw: ({ p, v, vh }) => {
+  draw: ({ p, viewport: { viewport: v, viewportHelper: vh } }) => {
     const coll = [];
 
     vh.push();

@@ -1,13 +1,15 @@
 import * as Viewport from 'viewport'
 
 // Thin p5 binding around Viewport.js (https://github.com/RobMakesThings/Viewport.js),
-// a 3D line renderer. Viewport itself is passed to sketches untouched as `v`
-// (so example code copies over as-is); this helper is `vh`, and adds a
-// default scene, a p5-style transform stack, and canvas-aware render/draw.
+// a 3D line renderer. Sketches get both inside a `viewport` arg: Viewport
+// itself, untouched, as `viewport.viewport` (so example code copies over
+// as-is), and this helper as `viewport.viewportHelper`, which adds a default
+// scene, a p5-style transform stack, and canvas-aware render/draw. The
+// example below names them `v` and `vh` when destructuring.
 //
 // Enable with `includes: ['viewport']` in initSketch, then:
 //
-//   draw: ({ p, v, vh }) => {
+//   draw: ({ p, viewport: { viewport: v, viewportHelper: vh } }) => {
 //     p.stroke(p.inkColor())
 //     p.strokeWeight(2)
 //
@@ -58,7 +60,7 @@ export class ViewportHelper {
   }
 
   pop() {
-    if (this.#stack.length === 0) throw new Error('vh.pop() without matching vh.push()')
+    if (this.#stack.length === 0) throw new Error('viewportHelper.pop() without matching viewportHelper.push()')
     this.#matrix = this.#stack.pop()
   }
 
@@ -135,7 +137,7 @@ export class ViewportHelper {
         sphere.paths = () => this.#yarnPaths(r, count)
         break
       default:
-        throw new Error(`vh.sphere(): unknown style '${style}'`)
+        throw new Error(`viewportHelper.sphere(): unknown style '${style}'`)
     }
     return this.transform(sphere)
   }
@@ -205,7 +207,7 @@ export class ViewportHelper {
         cylinder = new Viewport.Cylinder(r, -h / 2, h / 2)
         break
       default:
-        throw new Error(`vh.cylinder(): unknown style '${style}'`)
+        throw new Error(`viewportHelper.cylinder(): unknown style '${style}'`)
     }
     return this.transform(cylinder)
   }
