@@ -1,4 +1,10 @@
 import { initSketch } from '../../src/lib/sketchWrapper.js';
+import fontUrl from '../../src/fonts/Big Pixel.otf';
+import { parseHersheyFont, drawHersheyText } from '../../src/lib/hersheyFont.js';
+// Single-stroke body font (EMS Readability: a plotter version of Source Sans)
+import bodyFontSvg from 'hersheytext/svg_fonts/EMSReadability.svg?raw';
+
+const bodyFont = parseHersheyFont(bodyFontSvg);
 
 // Pumpkin seams, drawn as architectural views.
 //
@@ -46,6 +52,27 @@ const VIEWS = [
   { kind: 'elevation2', at: [0.75, y1] },
   { kind: 'tilted', at: [0.75, y2] }
 ];
+
+// Title across the top of the page. Each word goes on its own pen (layer).
+// `nudge` shifts a word from its auto-laid-out spot, as [x, y] fractions of
+// the page (so it holds across paper sizes); +y is down.
+const TITLE = [
+  { word: 'HARVEST', layer: '3-Pumpkin', nudge: [-0.025, 0] },
+  { word: 'JAM', layer: '2-Stem', nudge: [0.03, 0] },
+];
+const TITLE_WIDTH = 0.8; // fraction of page width the whole title spans
+const TITLE_BASELINE = 0.1; // fraction of page height
+
+// Invite details along the bottom, left-aligned, in the single-stroke body font
+const FOOTER = [
+  { text: 'SQUASH CARVING', layer: '1-Body' },
+  { text: 'JAM AND GRILL SESSION', layer: '1-Body' },
+  { text: '2613 E YESLER 4PM', layer: '1-Body' },
+];
+const FOOTER_LEFT = 0.08; // left edge as a fraction of page width; defaults to the title's
+const FOOTER_SIZE = 0.05; // font size as a fraction of page width
+const FOOTER_BASELINE = 0.75; // first line's baseline, as a fraction of page height
+const FOOTER_LEADING = 2.4; // line spacing, in multiples of the font size
 
 // Vertical stretch of the body; 1 is the profile as written below
 const HEIGHT = 1.45;
@@ -314,11 +341,71 @@ function bezierHead([p0, p1, p2, p3], t) {
   return [p0, a, d, lerp(d, e)];
 }
 
+// Draws an opentype.js path's outlines, one shape per contour
+function drawFontPath(p, path) {
+  let open = false;
+  for (const cmd of path.commands) {
+    if (cmd.type === 'M') {
+      if (open) p.endShape(p.CLOSE);
+      p.beginShape();
+      p.vertex(cmd.x, cmd.y);
+      open = true;
+    } else if (cmd.type === 'L') {
+      p.vertex(cmd.x, cmd.y);
+    } else if (cmd.type === 'Q') {
+      p.quadraticVertex(cmd.x1, cmd.y1, cmd.x, cmd.y);
+    } else if (cmd.type === 'C') {
+      p.bezierVertex(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y);
+    } else if (cmd.type === 'Z') {
+      p.endShape(p.CLOSE);
+      open = false;
+    }
+  }
+  if (open) p.endShape(p.CLOSE);
+}
+
 initSketch({
   includes: [],
+  preload: (p) => {
+    p.loadedFont = p.loadFont(fontUrl);
+  },
   draw: ({ p }) => {
     p.strokeWeight(2);
     p.noFill();
+
+    drawTitle();
+    drawFooter();
+
+    function drawFooter() {
+      const fontSize = FOOTER_SIZE * p.width;
+      FOOTER.forEach(({ text, layer }, i) => {
+        const x = p.width * FOOTER_LEFT;
+        const y = p.height * FOOTER_BASELINE + i * FOOTER_LEADING * fontSize;
+        p.withLayer(layer, () => {
+          p.stroke(p.inkColor());
+          drawHersheyText(p, bodyFont, text, x, y, fontSize);
+        });
+      });
+    }
+
+    // Words laid out on one line, scaled so the whole title spans TITLE_WIDTH
+    function drawTitle() {
+      const font = p.loadedFont.font;
+      const text = TITLE.map(({ word }) => word).join(' ');
+      const fontSize = (TITLE_WIDTH * p.width) / font.getAdvanceWidth(text, 1);
+      const space = font.getAdvanceWidth(' ', fontSize);
+      let x = (p.width - TITLE_WIDTH * p.width) / 2;
+      const baseline = p.height * TITLE_BASELINE;
+      for (const { word, layer, nudge = [0, 0] } of TITLE) {
+        const wx = x + nudge[0] * p.width;
+        const wy = baseline + nudge[1] * p.height;
+        p.withLayer(layer, () => {
+          p.stroke(p.inkColor());
+          drawFontPath(p, font.getPath(word, wx, wy, fontSize));
+        });
+        x += font.getAdvanceWidth(word, fontSize) + space;
+      }
+    }
 
     const closedPath = (pts) => {
       p.beginShape();
@@ -343,7 +430,7 @@ initSketch({
         CLIP_TILTED && style === 'tilted' ? buildDepthTest(project3, p.width, p.height) : null;
       const pen = makePen(toScreen, visible);
 
-      p.withLayer('1-Body', () => {
+      p.withLayer('3-Pumpkin', () => {
         p.stroke(p.inkColor());
         drawBody(style, yaw, toScreen, pen);
       });
@@ -351,7 +438,7 @@ initSketch({
         p.stroke(p.inkColor());
         drawStem(style, yaw, toScreen, pen);
       });
-      p.withLayer('3-Cut', () => {
+      p.withLayer('4-Cut', () => {
         p.stroke(p.inkColor());
         drawCut(style, pen);
       });
