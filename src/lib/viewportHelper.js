@@ -1,9 +1,34 @@
 import * as Viewport from 'viewport'
 
 // Thin p5 binding around Viewport.js (https://github.com/RobMakesThings/Viewport.js),
-// a 3D line renderer. Viewport itself is passed to sketches untouched as `v`
-// (so example code copies over as-is); this helper is `vh`, and adds a
-// default scene, a p5-style transform stack, and canvas-aware render/draw.
+// a 3D line renderer. Sketches get both inside a `viewport` arg: Viewport
+// itself, untouched, as `viewport.viewport` (so example code copies over
+// as-is), and this helper as `viewport.viewportHelper`, which adds a default
+// scene, a p5-style transform stack, and canvas-aware render/draw. The
+// example below names them `v` and `vh` when destructuring.
+//
+// Enable with `includes: ['viewport']` in initSketch, then:
+//
+//   draw: ({ p, viewport: { viewport: v, viewportHelper: vh } }) => {
+//     p.stroke(p.inkColor())
+//     p.strokeWeight(2)
+//
+//     // --- 3D: Viewport scene (vh) ---
+//     // Shapes live in world units (vh.cube() is 2 across), +Z up, placed with
+//     // vh.translate/rotate/scale - a separate stack from p5's push/pop.
+//     // Nothing is drawn until vh.render(), which projects the scene through
+//     // the camera and removes hidden lines, returning 2D Paths sized to the
+//     // canvas. vh.draw() then strokes them with the current p5 stroke.
+//     vh.scene.add(vh.cube())
+//     const paths = vh.render({ eye: vh.vec(4, 4, 4) })
+//     vh.draw(paths)
+//
+//     // --- 2D: native p5 ---
+//     // Draws immediately in canvas pixels (origin top-left, Y down), using
+//     // p5's own transforms. Flat ink on top of the render: it is not
+//     // occluded by, and does not occlude, anything in the 3D scene.
+//     p.circle(100, 100, 100)
+//   }
 export class ViewportHelper {
   #p
   #matrix = Viewport.Matrix.identity()
@@ -35,7 +60,7 @@ export class ViewportHelper {
   }
 
   pop() {
-    if (this.#stack.length === 0) throw new Error('vh.pop() without matching vh.push()')
+    if (this.#stack.length === 0) throw new Error('viewportHelper.pop() without matching viewportHelper.push()')
     this.#matrix = this.#stack.pop()
   }
 
@@ -112,7 +137,7 @@ export class ViewportHelper {
         sphere.paths = () => this.#yarnPaths(r, count)
         break
       default:
-        throw new Error(`vh.sphere(): unknown style '${style}'`)
+        throw new Error(`viewportHelper.sphere(): unknown style '${style}'`)
     }
     return this.transform(sphere)
   }
@@ -182,7 +207,7 @@ export class ViewportHelper {
         cylinder = new Viewport.Cylinder(r, -h / 2, h / 2)
         break
       default:
-        throw new Error(`vh.cylinder(): unknown style '${style}'`)
+        throw new Error(`viewportHelper.cylinder(): unknown style '${style}'`)
     }
     return this.transform(cylinder)
   }

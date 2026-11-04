@@ -1,26 +1,28 @@
 import { rayAndCircleIntersectionPoints } from '../../src/lib/intersectRayAndCircle.js';
 import { initSketch } from '../../src/lib/sketchWrapper.js';
 
-initSketch(({ p }) => {
-  const W = p.width;
-  const H = p.height;
+initSketch({
+  draw: ({ p }) => {
+    const W = p.width;
+    const H = p.height;
 
-  p.stroke(p.inkColor());
-  p.strokeWeight(2);
-  p.noFill();
+    p.stroke(p.inkColor());
+    p.strokeWeight(2);
+    p.noFill();
 
-  const numGrids = 10;
-  for (var i = 0; i < numGrids; ++i) {
-    const circleRadius = W * 0.2 * (1 * Math.sin((2 * 3.14) * (0.33 + i) / numGrids));
-    drawGridWithHole(p, {
-      gridSize: W * 0.5,
-      numLines: 10,
-      circleCenter: [0.5 * W, 0.5 * W],
-      circleRadius,
-      translateZ: -100 + i * 60,
-      layerName: `${i % 5}`,
-    });
-  }
+    const numGrids = 10;
+    for (var i = 0; i < numGrids; ++i) {
+      const circleRadius = W * 0.2 * (1 * Math.sin((2 * 3.14) * (0.33 + i) / numGrids));
+      drawGridWithHole(p, {
+        gridSize: W * 0.5,
+        numLines: 10,
+        circleCenter: [0.5 * W, 0.5 * W],
+        circleRadius,
+        translateZ: -100 + i * 60,
+        layerName: `${i % 5}`,
+      });
+    }
+  },
 });
 
 function drawGridWithHole(p, { gridSize, numLines, circleCenter, circleRadius, translateZ, layerName }) {

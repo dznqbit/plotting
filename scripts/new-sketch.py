@@ -43,14 +43,19 @@ index_html = f"""<!DOCTYPE html>
 # Create sketch.js
 sketch_js = """import { initSketch } from '../../src/lib/sketchWrapper.js'
 
-initSketch(({ p }) => {
-  // Your sketch here
-  // Use p.inkColor() instead of hardcoding black - it flips to white
-  // for the dev-mode dark canvas, but always exports as black ink.
-  p.stroke(p.inkColor())
-  p.strokeWeight(2)
-  p.noFill()
-  p.circle(p.width / 2, p.height / 2, 200)
+initSketch({
+  // Include named libraries to enable certain draw styles. Available:
+  //   'viewport' for 3D rendering, see ../../src/lib/viewportHelper.js
+  //   'toko' for "handy features", see ../../src/lib/tokoHelper.js
+  includes: [],
+  draw: ({ p }) => {
+    // Prefer p.inkColor() for sake of dark mode.
+    p.stroke(p.inkColor())
+    p.strokeWeight(2)
+    p.noFill()
+
+    p.circle(100, 100, 100)
+  },
 })
 """
 

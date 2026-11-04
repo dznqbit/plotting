@@ -28,6 +28,8 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "chroma-js": "^3.2.0",
+    "hersheytext": "^2.0.0",
     "p5": "^1.6.0",
     "qrcode": "^1.5.4"
   }
